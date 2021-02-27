@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Button, Heading, Link, Text, useToast } from "@chakra-ui/react";
-import "./App.css";
+
+import { Button, Heading, Link, useToast } from "@chakra-ui/react";
 import * as tf from "@tensorflow/tfjs";
 import { Bar } from "react-chartjs-2";
-import drawHere from "./drawHere.jpg";
 import { ExternalLinkIcon } from '@chakra-ui/icons'
+
+import drawHere from "./drawHere.jpg";
+import "./App.css";
 
 const App = () => {
   const canvasState = useRef(false);
@@ -64,6 +66,7 @@ const App = () => {
     canvasRef.current.addEventListener("mousedown", handleStartDraw);
     canvasRef.current.addEventListener("mouseup", () => handleEndDraw(context));
     canvasRef.current.addEventListener("mousemove", (event) => handleDraw(event, context))
+    // eslint-disable-next-line
   }, []);
 
   const getImageTensorFromCanvas = () => {
@@ -122,7 +125,7 @@ const App = () => {
             <canvas ref={canvasRef} />
             <Button colorScheme="teal" onClick={handleClear}>Clear canvas</Button>
           </div>
-          <img src={drawHere} width={100} />
+          <img src={drawHere} width={100} alt="draw here"/>
         </div>
         <div className="chart">
           <Bar data={data} height={100} width={300} />
