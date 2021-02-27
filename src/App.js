@@ -49,15 +49,15 @@ const App = () => {
   }
 
   useEffect(() => {
-    tf.loadLayersModel(process.env.REACT_APP_DENSE_MODEL).then((loadedModel) => {
+    tf.loadLayersModel(process.env.REACT_APP_DENSE_MODEddL).then((loadedModel) => {
       denseModel.current = loadedModel;
       informAboutLoad("Dense")
-    });
+    }).catch(() => informAboutModelLoadFail("Dense"));
 
     tf.loadLayersModel(process.env.REACT_APP_CNN_MODEL).then((loadedModel) => {
       CNNModel.current = loadedModel;
       informAboutLoad("CNN")
-    });
+    }).catch(() => informAboutModelLoadFail("CNN"));
 
     const context = canvasRef.current.getContext("2d");
     canvasRef.current.height = 200;
@@ -79,15 +79,15 @@ const App = () => {
   const makePredictionDense = () => {
     const imageTensor = getImageTensorFromCanvas();
     const reshapedTensor = imageTensor.reshape([1, 28, 28]);
-    const predictionTensor = denseModel.current.predict(reshapedTensor);
-    predictionTensor.flatten().data().then(setDensePreds).catch(informAboutModelLoadFail);
+    const predictionTensor = denseModel.current?.predict?.(reshapedTensor);
+    predictionTensor?.flatten().data().then(setDensePreds);
   }
 
   const makePredictionCNN = () => {
     const imageTensor = getImageTensorFromCanvas();
     const reshapedTensor = imageTensor.reshape([1, 28, 28, 1]);
-    const predictionTensor = CNNModel.current.predict(reshapedTensor);
-    predictionTensor.flatten().data().then(setCnnPreds).catch(informAboutModelLoadFail);
+    const predictionTensor = CNNModel.current?.predict?.(reshapedTensor);
+    predictionTensor?.flatten().data().then(setCnnPreds);
   }
 
   const informAboutLoad = (modelName) => {
