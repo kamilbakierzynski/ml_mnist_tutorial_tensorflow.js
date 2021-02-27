@@ -6,6 +6,7 @@ import { Bar } from "react-chartjs-2";
 import { ExternalLinkIcon } from '@chakra-ui/icons'
 
 import drawHere from "./drawHere.jpg";
+import penIcon from "./pen.ico";
 import "./App.css";
 
 const App = () => {
@@ -130,7 +131,7 @@ const App = () => {
       <div className="wrapper">
         <div className="img_helper">
           <div className="canvas">
-            <canvas ref={canvasRef} />
+            <canvas ref={canvasRef} style={{ cursor: `url(${penIcon}) -40 40, default`}}/>
             <Button colorScheme="teal" onClick={handleClear}>Clear canvas</Button>
           </div>
           <img src={drawHere} width={100} alt="draw here" />
