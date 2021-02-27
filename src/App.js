@@ -49,7 +49,7 @@ const App = () => {
   }
 
   useEffect(() => {
-    tf.loadLayersModel(process.env.REACT_APP_DENSE_MODEddL).then((loadedModel) => {
+    tf.loadLayersModel(process.env.REACT_APP_DENSE_MODEL).then((loadedModel) => {
       denseModel.current = loadedModel;
       informAboutLoad("Dense")
     }).catch(() => informAboutModelLoadFail("Dense"));
