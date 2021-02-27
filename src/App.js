@@ -49,12 +49,12 @@ const App = () => {
   }
 
   useEffect(() => {
-    tf.loadLayersModel("http://localhost:3000/dense/model.json").then((loadedModel) => {
+    tf.loadLayersModel(process.env.REACT_APP_DENSE_MODEL).then((loadedModel) => {
       denseModel.current = loadedModel;
       informAboutLoad("Dense")
     });
 
-    tf.loadLayersModel("http://localhost:3000/cnn/model.json").then((loadedModel) => {
+    tf.loadLayersModel(process.env.REACT_APP_CNN_MODEL).then((loadedModel) => {
       CNNModel.current = loadedModel;
       informAboutLoad("CNN")
     });
@@ -80,14 +80,14 @@ const App = () => {
     const imageTensor = getImageTensorFromCanvas();
     const reshapedTensor = imageTensor.reshape([1, 28, 28]);
     const predictionTensor = denseModel.current.predict(reshapedTensor);
-    predictionTensor.flatten().data().then(setDensePreds);
+    predictionTensor.flatten().data().then(setDensePreds).catch(informAboutModelLoadFail);
   }
 
   const makePredictionCNN = () => {
     const imageTensor = getImageTensorFromCanvas();
     const reshapedTensor = imageTensor.reshape([1, 28, 28, 1]);
     const predictionTensor = CNNModel.current.predict(reshapedTensor);
-    predictionTensor.flatten().data().then(setCnnPreds);
+    predictionTensor.flatten().data().then(setCnnPreds).catch(informAboutModelLoadFail);
   }
 
   const informAboutLoad = (modelName) => {
@@ -96,7 +96,16 @@ const App = () => {
       status: "success",
       duration: 5000,
       isClosable: true
-    })
+    });
+  }
+
+  const informAboutModelLoadFail = (modelName) => {
+    toast({
+      title: `${modelName} model failed to load`,
+      status: "error",
+      duration: null,
+      isClosable: false
+    });
   }
 
   const data = {
@@ -124,7 +133,7 @@ const App = () => {
             <canvas ref={canvasRef} />
             <Button colorScheme="teal" onClick={handleClear}>Clear canvas</Button>
           </div>
-          <img src={drawHere} width={100} alt="draw here"/>
+          <img src={drawHere} width={100} alt="draw here" />
         </div>
         <div className="chart">
           <Bar data={data} height={100} width={300} />
