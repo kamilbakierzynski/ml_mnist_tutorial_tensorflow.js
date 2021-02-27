@@ -1,38 +1,63 @@
-.App {
-  text-align: center;
+html {
+  background-color: #ffffff;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.heading {
+  margin-top: 10px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.page {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.wrapper {
+  width: 100%;
+  align-items: flex-start;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: #ffffff;
+  padding: 40px;
+}
+
+.wrapper .chart {
+  flex-grow: 1;
+  padding: 20px;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 5px 5px 9px #bdbdbd, -5px -5px 9px #ffffff;
+}
+
+.wrapper .canvas {
+  padding: 20px;
+  margin-right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 5px 5px 9px #bdbdbd, -5px -5px 9px #ffffff;
+}
+
+.wrapper .canvas canvas {
+  margin-bottom: 20px;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: inset 5px 5px 9px #bdbdbd, inset -5px -5px 9px #ffffff;
+}
+
+.img_helper {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.footer {
+  display: flex;
+  position: fixed;
+  bottom: 10px;
 }

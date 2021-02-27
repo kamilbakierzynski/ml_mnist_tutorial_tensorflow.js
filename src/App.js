@@ -1,25 +1,139 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useRef, useState } from "react";
+import { Button, Heading, Link, Text, useToast } from "@chakra-ui/react";
+import "./App.css";
+import * as tf from "@tensorflow/tfjs";
+import { Bar } from "react-chartjs-2";
+import drawHere from "./drawHere.jpg";
+import { ExternalLinkIcon } from '@chakra-ui/icons'
 
-function App() {
+const App = () => {
+  const canvasState = useRef(false);
+  const canvasRef = useRef(null);
+  const denseModel = useRef();
+  const CNNModel = useRef();
+
+  const [densePreds, setDensePreds] = useState([]);
+  const [cnnPreds, setCnnPreds] = useState([]);
+
+  const toast = useToast();
+
+  const handleStartDraw = () => {
+    canvasState.current = true;
+  };
+
+  const handleEndDraw = (context) => {
+    canvasState.current = false;
+    context.beginPath();
+    makePredictionDense();
+    makePredictionCNN();
+  };
+
+  const handleDraw = (event, context) => {
+    if (!canvasState.current) return;
+    context.lineWidth = 5;
+    context.lineCap = "round";
+    context.strokeStyle = "#319795";
+    console.log(event);
+    context.lineTo(event.offsetX, event.offsetY);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(event.offsetX, event.offsetY);
+  }
+
+  const handleClear = () => {
+    const context = canvasRef.current.getContext("2d");
+    context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    setDensePreds([]);
+    setCnnPreds([]);
+  }
+
+  useEffect(() => {
+    tf.loadLayersModel("http://localhost:3000/dense/model.json").then((loadedModel) => {
+      denseModel.current = loadedModel;
+      informAboutLoad("Dense")
+    });
+
+    tf.loadLayersModel("http://localhost:3000/cnn/model.json").then((loadedModel) => {
+      CNNModel.current = loadedModel;
+      informAboutLoad("CNN")
+    });
+
+    const context = canvasRef.current.getContext("2d");
+    canvasRef.current.height = 200;
+    canvasRef.current.width = 200;
+    canvasRef.current.addEventListener("mousedown", handleStartDraw);
+    canvasRef.current.addEventListener("mouseup", () => handleEndDraw(context));
+    canvasRef.current.addEventListener("mousemove", (event) => handleDraw(event, context))
+  }, []);
+
+  const getImageTensorFromCanvas = () => {
+    const context = canvasRef.current.getContext("2d");
+    const imageData = context.getImageData(0, 0, 200, 200);
+    const imageTensor = tf.browser.fromPixels(imageData, 1).cast("float32");
+    const resizedTensor = tf.image.resizeBilinear(imageTensor, [28, 28]);
+    return resizedTensor;
+  }
+
+  const makePredictionDense = () => {
+    const imageTensor = getImageTensorFromCanvas();
+    const reshapedTensor = imageTensor.reshape([1, 28, 28]);
+    const predictionTensor = denseModel.current.predict(reshapedTensor);
+    predictionTensor.flatten().data().then(setDensePreds);
+  }
+
+  const makePredictionCNN = () => {
+    const imageTensor = getImageTensorFromCanvas();
+    const reshapedTensor = imageTensor.reshape([1, 28, 28, 1]);
+    const predictionTensor = CNNModel.current.predict(reshapedTensor);
+    predictionTensor.flatten().data().then(setCnnPreds);
+  }
+
+  const informAboutLoad = (modelName) => {
+    toast({
+      title: `${modelName} model loaded succesfully!`,
+      status: "success",
+      duration: 5000,
+      isClosable: true
+    })
+  }
+
+  const data = {
+    labels: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
+    datasets: [
+      {
+        label: 'CNN',
+        data: cnnPreds,
+        backgroundColor: '#6B46C1',
+      },
+      {
+        label: 'Dense',
+        data: densePreds,
+        backgroundColor: '#4FD1C5',
+      },
+    ],
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="page">
+      <Heading className="heading">Dense/CNN MNIST Comparision</Heading>
+      <div className="wrapper">
+        <div className="img_helper">
+          <div className="canvas">
+            <canvas ref={canvasRef} />
+            <Button colorScheme="teal" onClick={handleClear}>Clear canvas</Button>
+          </div>
+          <img src={drawHere} width={100} />
+        </div>
+        <div className="chart">
+          <Bar data={data} height={100} width={300} />
+        </div>
+      </div>
+      <div className="footer">
+        <Link fontSize="xs" href="https://github.com/kamilbakierzynski" isExternal>
+          Github <ExternalLinkIcon mx="2px" />
+        </Link>
+      </div>
     </div>
-  );
+  )
 }
-
 export default App;
