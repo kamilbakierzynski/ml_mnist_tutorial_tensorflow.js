@@ -35,7 +35,6 @@ const App = () => {
     context.lineWidth = 5;
     context.lineCap = "round";
     context.strokeStyle = "#319795";
-    console.log(event);
     context.lineTo(event.offsetX, event.offsetY);
     context.stroke();
     context.beginPath();
